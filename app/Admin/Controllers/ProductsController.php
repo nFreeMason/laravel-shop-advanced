@@ -11,6 +11,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\Request;
 
 class ProductsController extends Controller
 {
@@ -21,8 +22,9 @@ class ProductsController extends Controller
      *
      * @return Content
      */
-    public function index()
+    public function index(Request $request)
     {
+
         return Admin::content(function (Content $content) {
             $content->header('商品列表');
             $content->body($this->grid());
