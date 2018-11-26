@@ -29,4 +29,9 @@ class UserAddressRequest extends Request
             'contact_phone' => '电话',
         ];
     }
+
+    public function withValidator($val)
+	{
+		dd($val->errors());
+	}
 }

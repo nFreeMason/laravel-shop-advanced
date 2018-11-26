@@ -13,10 +13,24 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use App\Http\Requests\Admin\HandleRefundRequest;
+use App\Http\Requests\CrowdFundingOrderRequest;
+use App\Services\OrderService;
+use App\Models\{ProductSku,UserAddress};
 
 class OrdersController extends Controller
 {
     use ModelForm;
+
+	// 创建一个新的方法用于接受众筹商品下单请求
+	public function crowdfunding(CrowdFundingOrderRequest $request, OrderService $orderService)
+	{
+		$user    = $request->user();
+		$sku     = ProductSku::find($request->input('sku_id'));
+		$address = UserAddress::find($request->input('address_id'));
+		$amount  = $request->input('amount');
+
+		return $orderService->crowdfunding($user, $address, $sku, $amount);
+	}
 
     public function index()
     {
