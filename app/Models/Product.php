@@ -15,7 +15,9 @@ class Product extends Model
 		self::TYPE_CROWDFUNDING => '众筹商品',
 	];
 
-    protected $fillable = ['title', 'description', 'image', 'on_sale', 'rating', 'sold_count', 'review_count', 'price', 'type'];
+    protected $fillable = ['title', 'description', 'image', 'on_sale', 'rating', 'sold_count', 'review_count', 'price', 'type',
+						   'long_title', // 添加 long_title 到 $fillable 属性中
+		];
     protected $casts = [
         'on_sale' => 'boolean', // on_sale 是一个布尔类型的字段
     ];
@@ -44,5 +46,59 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function toESArray()
+	{
+		// 只取出需要的字段
+		$arr = array_only($this->toArray(),[
+			'id',
+			'type',
+			'title',
+			'category_id',
+			'long_title',
+			'on_sale',
+			'rating',
+			'sold_count',
+			'review_count',
+			'price',
+		]);
+
+		// 如果商品有类目，是 category 字段类目名数组，否则空客串
+		$arr['category']  = $this->category ? explode('-',$this->category->full_name) : '';
+
+		// 类目的 path 字段
+		$arr['category_path'] = $this->category ? $this->category->path : '';
+
+		// strip_tags 函数可以将 html 标签去掉
+		$arr['description'] = strip_tags($this->description);
+
+		// 只取出需要的 sku 字段
+		$arr['skus'] = $this->skus->map(function(ProductSku $sku){
+			return array_only($sku->toArray(),['title','description','price']);
+		});
+
+		// 只取出需要的商品属性字段
+		$arr['properties'] = $this->properties->map(function (ProductProperty $property) {
+			return array_only($property->toArray(), ['name', 'value']);
+		});
+
+		return $arr;
+	}
+
+	public function properties()
+	{
+		return $this->hasMany(ProductProperty::class);
+	}
+
+	public function getGroupedPropertiesAttribute()
+	{
+		return $this->properties
+			// 按照属性名聚合，返回的集合的 key 是属性名，value 是包含该属性名的所有属性集合
+			->groupBy('name')
+			->map(function ($properties) {
+				// 使用 map 方法将属性集合变为属性值集合
+				return $properties->pluck('value')->all();
+			});
+	}
 
 }
