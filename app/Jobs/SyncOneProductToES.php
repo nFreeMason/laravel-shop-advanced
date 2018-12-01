@@ -23,6 +23,7 @@ class SyncOneProductToES implements ShouldQueue
     public function __construct(Product $product)
     {
         $this->product = $product;
+		
     }
 
     /**
