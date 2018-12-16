@@ -47,7 +47,6 @@ class SyncProducts extends Command
 			// 使用 chunkById 避免一次性加载过多数据
 			   ->chunkById(100, function ($products) use ($es) {
 				$this->info(sprintf('正在同步 ID 范围为 %s 至 %s 的商品', $products->first()->id, $products->last()->id));
-
 				// 初始化请求体
 				$req = ['body' => []];
 				// 遍历商品
