@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SeckillOrderRequest;
 use App\Http\Requests\SendReviewRequest;
 use App\Exceptions\InvalidRequestException;
 use App\Http\Requests\OrderRequest;
+use App\Models\ProductSku;
+use App\Models\SeckillProduct;
 use App\Models\UserAddress;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -17,6 +20,16 @@ use Carbon\Carbon;
 
 class OrdersController extends Controller
 {
+
+	public function seckill(SeckillOrderRequest $request, OrderService $orderService)
+	{
+		$user    = $request->user();
+		$address = UserAddress::find($request->input('address_id'));
+		$sku     = ProductSku::find($request->input('sku_id'));
+
+		return $orderService->seckill($user, $address, $sku);
+	}
+
     public function index(Request $request)
     {
         $orders = Order::query()
