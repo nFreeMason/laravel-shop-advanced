@@ -1,6 +1,7 @@
 <?php
 
-Route::redirect('/', '/products')->name('root');
+//Route::redirect('/', '/products')->name('root');
+Route::get('/','Test@test');
 Route::get('products', 'ProductsController@index')->name('products.index');
 Route::get('test','Test@index');
 
